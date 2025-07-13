@@ -65,8 +65,9 @@ export default function App() {
     <>
       <nav className="nav-bar">
         <div className="logo">
-          <span role="img">🍿</span>
-          <h1>usePopcorn</h1>
+          <span role="img">🎥</span>
+          <h1>Watch TV</h1>
+          <span role="img">📽</span>
         </div>
         <input
           className="search"
