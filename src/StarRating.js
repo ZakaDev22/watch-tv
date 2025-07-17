@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const containerStyle = {
   display: "flex",
@@ -6,16 +7,26 @@ const containerStyle = {
   gab: "16px",
 };
 
+StarRating.propTypes = {
+  MaxRating: PropTypes.number,
+  color: PropTypes.string,
+  size: PropTypes.number,
+  defaultRating: PropTypes.number,
+  onSetRating: PropTypes.func,
+};
 export default function StarRating({
   MaxRating = 5,
   color = "#fcc419",
   size = 48,
+  defaultRating = 0,
+  onSetRating,
 }) {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
 
   function handleRate(rating) {
     setRating(rating);
+    onSetRating(rating);
   }
   const textStyle = {
     lineHeight: "1",
