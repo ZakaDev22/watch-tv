@@ -1,5 +1,11 @@
 import { useState } from "react";
 
+import axios from "axios";
+
+const key = "b2523bbb";
+
+const baseURL = `http://www.omdbapi.com/?i=tt3896198&apikey=${key}&s=`; // Corrected baseURL
+
 const tempMovieData = [
   {
     imdbID: "tt1375666",
@@ -53,6 +59,12 @@ const average = (arr) =>
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+
+  fetch(baseURL + "spider")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+    });
 
   return (
     <>
