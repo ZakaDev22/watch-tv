@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import axios from "axios";
 
@@ -60,12 +60,13 @@ export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
 
-  fetch(baseURL + "spider")
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-    });
-
+  useEffect(() => {
+    fetch(baseURL + "spider")
+      .then((response) => response.json())
+      .then((data) => {
+        setMovies(data.Search || []);
+      }, []);
+  });
   return (
     <>
       <NavBar>
