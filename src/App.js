@@ -4,7 +4,7 @@ import axios from "axios";
 
 const key = "b2523bbb";
 
-const baseURL = `http://www.omdbapi.com/?i=tt3896198&apikey=${key}&s=`; // Corrected baseURL
+const baseURL = `http://www.omdbapi.com/?apikey=${key}&s=`; // Corrected baseURL
 
 const tempMovieData = [
   {
@@ -61,12 +61,18 @@ export default function App() {
   const [watched, setWatched] = useState(tempWatchedData);
 
   useEffect(() => {
-    fetch(baseURL + "spider")
-      .then((response) => response.json())
-      .then((data) => {
-        setMovies(data.Search || []);
-      }, []);
-  });
+    async function handleFetchMovies() {
+      try {
+        const response = await axios.get(baseURL + "spider");
+        setMovies(response.data.Search || []);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    }
+
+    handleFetchMovies();
+  }, []);
+
   return (
     <>
       <NavBar>
