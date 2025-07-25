@@ -59,14 +59,23 @@ const average = (arr) =>
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function handleFetchMovies() {
       try {
-        const response = await axios.get(baseURL + "spider");
+        setIsLoading(true);
+        const response = await axios.get(baseURL + "batman");
+        if (response.data.Response === "False") {
+          throw new Error(response.data.Error);
+        }
         setMovies(response.data.Search || []);
       } catch (error) {
         console.error("Error fetching movies:", error);
+        setError("Failed to fetch movies. Please try again later.");
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -82,7 +91,9 @@ export default function App() {
       </NavBar>
       <Main>
         <Box>
-          <MovieList movies={movies} />
+          {isLoading && <Loader />}
+          {error && <Error message={error} />}
+          {!isLoading && !error && <MovieList movies={movies} />}
         </Box>
         <Box>
           <WatchedSummary watched={watched} />
@@ -91,6 +102,14 @@ export default function App() {
       </Main>
     </>
   );
+}
+
+function Loader() {
+  return <p className="loader">Loading...</p>;
+}
+
+function Error({ message }) {
+  return <p className="error">⛔{message}</p>;
 }
 
 function Main({ children }) {
