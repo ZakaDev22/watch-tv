@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
 import axios from "axios";
+import { func } from "prop-types";
 
 const key = "b2523bbb";
 
-const baseURL = `http://www.omdbapi.com/?apikey=${key}&s=`; // Corrected baseURL
+const baseURL = `http://www.omdbapi.com/?apikey=${key}`; // Corrected baseURL
 
 const tempMovieData = [
   {
@@ -62,13 +63,16 @@ export default function App() {
   const [watched, setWatched] = useState(tempWatchedData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedId, setSelectedId] = useState("tt6751668");
+
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect(() => {
     async function handleFetchMovies() {
       try {
         setIsLoading(true);
         setError("");
-        const response = await axios.get(`${baseURL}${query}`);
+        const response = await axios.get(`${baseURL}&s=${query}`);
         if (response.data.Response === "False") {
           throw new Error(response.data.Error);
         }
@@ -90,6 +94,41 @@ export default function App() {
     handleFetchMovies();
   }, [query]);
 
+  function handleSelectedMovie(id) {
+    if (id === selectedId) return;
+
+    setSelectedId((id) => (id === null ? id : null));
+    async function fetchMovieDetails() {
+      try {
+        setIsLoading(true);
+        setError("");
+        const response = await axios.get(`${baseURL}&i=${id}`);
+        if (response.data.Response === "False") {
+          throw new Error(response.data.Error);
+        }
+        // selectedMovie = response.data;
+        console.log("Selected Movie:", response.data);
+        setSelectedMovie((mov) => (mov = response.data));
+        console.log("movie state", selectedMovie);
+      } catch (error) {
+        console.error("Error fetching movie details:", error);
+        setError("Failed to fetch movie details. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchMovieDetails();
+  }
+
+  function handleClickMovie(id) {
+    setSelectedId(id === selectedId ? null : id);
+  }
+
+  function handleCloseDetails() {
+    setSelectedId(null);
+  }
+
   return (
     <>
       <NavBar>
@@ -101,11 +140,22 @@ export default function App() {
         <Box>
           {isLoading && <Loader />}
           {error && <Error message={error} />}
-          {!isLoading && !error && <MovieList movies={movies} />}
+          {!isLoading && !error && (
+            <MovieList movies={movies} onSelectedMovie={handleClickMovie} />
+          )}
         </Box>
         <Box>
-          <WatchedSummary watched={watched} />
-          <WatchedMovieList watched={watched} />
+          {selectedId ? (
+            <MovieDetails
+              selectedId={selectedId}
+              onCloseDetails={handleCloseDetails}
+            />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedMovieList watched={watched} />
+            </>
+          )}
         </Box>
       </Main>
     </>
@@ -126,7 +176,7 @@ function Main({ children }) {
 
 function WatchedMovieList({ watched }) {
   return (
-    <ul className="list">
+    <ul className="list list-movies">
       {watched.map((movie) => (
         <WatchedMovieItem key={movie.imdbID} movie={movie} />
       ))}
@@ -155,6 +205,18 @@ function WatchedMovieItem({ movie }) {
     </li>
   );
 }
+
+function MovieDetails({ selectedId, onCloseDetails }) {
+  return (
+    <div className="details">
+      <button className="btn-back" onClick={() => onCloseDetails()}>
+        &larr;
+      </button>
+      <p>{selectedId}</p>
+    </div>
+  );
+}
+
 function WatchedSummary({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
@@ -196,19 +258,23 @@ function Box({ children }) {
   );
 }
 
-function MovieList({ movies }) {
+function MovieList({ movies, onSelectedMovie }) {
   return (
-    <ul className="list">
+    <ul className="list list-movies">
       {movies?.map((movie) => (
-        <MovieItem key={movie.imdbID} movie={movie} />
+        <MovieItem
+          key={movie.imdbID}
+          movie={movie}
+          onSelectedMovie={onSelectedMovie}
+        />
       ))}
     </ul>
   );
 }
 
-function MovieItem({ movie }) {
+function MovieItem({ movie, onSelectedMovie }) {
   return (
-    <li>
+    <li onClick={() => onSelectedMovie(movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
