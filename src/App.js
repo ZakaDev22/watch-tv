@@ -58,8 +58,8 @@ const average = (arr) =>
 
 export default function App() {
   const [query, setQuery] = useState("spider-man");
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -99,6 +99,11 @@ export default function App() {
     setSelectedId(null);
   }
 
+  function handleAddToWatchedList({ movie }) {
+    setWatched((watched) => [...watched, movie]);
+    console.log(watched);
+  }
+
   return (
     <>
       <NavBar>
@@ -119,6 +124,7 @@ export default function App() {
             <MovieDetails
               selectedId={selectedId}
               onCloseDetails={handleCloseDetails}
+              onAddToWatchedList={handleAddToWatchedList}
             />
           ) : (
             <>
@@ -176,11 +182,11 @@ function WatchedMovieItem({ movie }) {
   );
 }
 
-function MovieDetails({ selectedId, onCloseDetails }) {
+function MovieDetails({ selectedId, onCloseDetails, onAddToWatchedList }) {
   const [selectedMovie, setSelectedMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const {
-    Title: Title,
+    Title: title,
     Year: year,
     Poster: poster,
     Runtime: runtime,
@@ -204,9 +210,7 @@ function MovieDetails({ selectedId, onCloseDetails }) {
             throw new Error(response.data.Error);
           }
           // selectedMovie = response.data;
-          console.log("Selected Movie:", response.data);
           setSelectedMovie((mov) => response.data);
-          console.log("movie state", selectedMovie);
         } catch (error) {
           console.error("Error fetching movie details:", error);
         } finally {
@@ -219,6 +223,20 @@ function MovieDetails({ selectedId, onCloseDetails }) {
     [selectedId]
   );
 
+  function handleAdd() {
+    const movie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      runtime: Number(runtime.split(" ")[0]),
+      imdbRating: Number(imdbRating),
+    };
+
+    console.log("Adding movie to watched list:", movie);
+    onAddToWatchedList({ movie });
+  }
+
   return (
     <div className="details">
       {isLoading ? (
@@ -229,9 +247,9 @@ function MovieDetails({ selectedId, onCloseDetails }) {
             <button className="btn-back" onClick={() => onCloseDetails()}>
               &larr;
             </button>
-            <img src={poster} alt={`Poster Of ${Title}`}></img>
+            <img src={poster} alt={`Poster Of ${title}`}></img>
             <div className="details-overview">
-              <h2>{Title}</h2>
+              <h2>{title}</h2>
               <p>
                 {year} &bull; {runtime}
               </p>
@@ -242,6 +260,9 @@ function MovieDetails({ selectedId, onCloseDetails }) {
           <section>
             <div className="rating">
               <StarRating MaxRating={10} size={30} color="#fcc419" />
+              <button className="btn-add" onClick={handleAdd}>
+                Add To Watch List
+              </button>
             </div>
             <p>
               {language} &bull; {country}
