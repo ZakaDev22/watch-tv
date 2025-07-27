@@ -104,6 +104,10 @@ export default function App() {
     handleCloseDetails();
   }
 
+  function handleDeleteWatchedMovie(id) {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  }
+
   return (
     <>
       <NavBar>
@@ -130,7 +134,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList
+                watched={watched}
+                onDeleteWatchedMovie={handleDeleteWatchedMovie}
+              />
             </>
           )}
         </Box>
@@ -151,16 +158,20 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
-function WatchedMovieList({ watched }) {
+function WatchedMovieList({ watched, onDeleteWatchedMovie }) {
   return (
     <ul className="list list-movies">
       {watched.map((movie) => (
-        <WatchedMovieItem key={movie.imdbID} movie={movie} />
+        <WatchedMovieItem
+          key={movie.imdbID}
+          movie={movie}
+          onDeleteWatchedMovie={onDeleteWatchedMovie}
+        />
       ))}
     </ul>
   );
 }
-function WatchedMovieItem({ movie }) {
+function WatchedMovieItem({ movie, onDeleteWatchedMovie }) {
   return (
     <li key={movie.imdbID}>
       <img src={movie.poster} alt={`${movie.Title} poster`} />
@@ -178,6 +189,12 @@ function WatchedMovieItem({ movie }) {
           <span>⏳</span>
           <span>{movie.runtime} min</span>
         </p>
+        <button
+          className="btn-delete"
+          onClick={() => onDeleteWatchedMovie(movie.imdbID)}
+        >
+          X
+        </button>
       </div>
     </li>
   );
