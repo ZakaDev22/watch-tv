@@ -178,7 +178,7 @@ function WatchedMovieItem({ movie }) {
 
 function MovieDetails({ selectedId, onCloseDetails }) {
   const [selectedMovie, setSelectedMovie] = useState({});
-
+  const [isLoading, setIsLoading] = useState(false);
   const {
     Title: Title,
     Year: year,
@@ -198,6 +198,7 @@ function MovieDetails({ selectedId, onCloseDetails }) {
     function () {
       async function fetchMovieDetails() {
         try {
+          setIsLoading(true);
           const response = await axios.get(`${baseURL}&i=${selectedId}`);
           if (response.data.Response === "False") {
             throw new Error(response.data.Error);
@@ -208,50 +209,52 @@ function MovieDetails({ selectedId, onCloseDetails }) {
           console.log("movie state", selectedMovie);
         } catch (error) {
           console.error("Error fetching movie details:", error);
+        } finally {
+          setIsLoading(false);
         }
       }
 
       fetchMovieDetails();
     },
-    [selectedMovie]
+    [selectedId]
   );
 
   return (
     <div className="details">
-      <header>
-        <button className="btn-back" onClick={() => onCloseDetails()}>
-          &larr;
-        </button>
-        <img src={poster} alt={`Poster Of ${Title}`}></img>
-        <div className="details-overview">
-          <h2>{Title}</h2>
-          <p>
-            {year} &bull; {runtime}
-          </p>
-          <p>{genre};</p>
-          <p>⭐ {imdbRating} IMDB Rating</p>
-        </div>
-      </header>
-      <section>
-        <div className="ratting">
-          <StarRating
-            MaxRating={10}
-            size={24}
-            color="blue"
-            defaultRating={imdbRating / 2}
-          />
-        </div>
-        <p>
-          {language} &bull; {country}
-        </p>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <header>
+            <button className="btn-back" onClick={() => onCloseDetails()}>
+              &larr;
+            </button>
+            <img src={poster} alt={`Poster Of ${Title}`}></img>
+            <div className="details-overview">
+              <h2>{Title}</h2>
+              <p>
+                {year} &bull; {runtime}
+              </p>
+              <p>{genre};</p>
+              <p>⭐ {imdbRating} IMDB Rating</p>
+            </div>
+          </header>
+          <section>
+            <div className="rating">
+              <StarRating MaxRating={10} size={30} color="#fcc419" />
+            </div>
+            <p>
+              {language} &bull; {country}
+            </p>
 
-        <p className="details-plot">
-          <em>{plot}</em>
-        </p>
-        <p>Starring: {actors}</p>
-        <p>Directed by {director}</p>
-      </section>
-      <p>{selectedId}</p>
+            <p className="details-plot">
+              <em>{plot}</em>
+            </p>
+            <p>Starring: {actors}</p>
+            <p>Directed by {director}</p>
+          </section>
+        </>
+      )}
     </div>
   );
 }
