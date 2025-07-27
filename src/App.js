@@ -197,6 +197,9 @@ function MovieDetails({
     (movie) => movie.imdbID === selectedId
   );
 
+  const watchedUserRating =
+    watchedList.find((m) => m.imdbID === selectedId)?.userRating || 0;
+
   const {
     Title: title,
     Year: year,
@@ -286,9 +289,17 @@ function MovieDetails({
                   )}
                 </>
               ) : (
-                <p className="user-rating">
-                  This Movie Is Allredy been Watched And Reviewed ✅
-                </p>
+                <>
+                  <p className="user-rating">
+                    <small>
+                      {" "}
+                      You Had Allredy Watched And Reviewed This Movie ✅
+                    </small>
+                  </p>
+                  <p className="user-rating-value">
+                    Your Rating: {watchedUserRating} ⭐
+                  </p>
+                </>
               )}
             </div>
             <p>
