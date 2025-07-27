@@ -125,6 +125,7 @@ export default function App() {
               selectedId={selectedId}
               onCloseDetails={handleCloseDetails}
               onAddToWatchedList={handleAddToWatchedList}
+              watchedList={watched}
             />
           ) : (
             <>
@@ -182,10 +183,19 @@ function WatchedMovieItem({ movie }) {
   );
 }
 
-function MovieDetails({ selectedId, onCloseDetails, onAddToWatchedList }) {
+function MovieDetails({
+  selectedId,
+  onCloseDetails,
+  onAddToWatchedList,
+  watchedList,
+}) {
   const [selectedMovie, setSelectedMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
+
+  const isMovieWatched = watchedList.some(
+    (movie) => movie.imdbID === selectedId
+  );
 
   const {
     Title: title,
@@ -261,16 +271,24 @@ function MovieDetails({ selectedId, onCloseDetails, onAddToWatchedList }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating
-                MaxRating={10}
-                size={30}
-                color="#fcc419"
-                onSetRating={setUserRating}
-              />
-              {userRating > 0 && (
-                <button className="btn-add" onClick={handleAdd}>
-                  Add To Watch List
-                </button>
+              {!isMovieWatched ? (
+                <>
+                  <StarRating
+                    MaxRating={10}
+                    size={30}
+                    color="#fcc419"
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      Add To Watch List
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p className="user-rating">
+                  This Movie Is Allredy been Watched And Reviewed ✅
+                </p>
               )}
             </div>
             <p>
