@@ -101,7 +101,7 @@ export default function App() {
 
   function handleAddToWatchedList({ movie }) {
     setWatched((watched) => [...watched, movie]);
-    console.log(watched);
+    handleCloseDetails();
   }
 
   return (
@@ -162,8 +162,8 @@ function WatchedMovieList({ watched }) {
 function WatchedMovieItem({ movie }) {
   return (
     <li key={movie.imdbID}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.Title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
@@ -185,13 +185,14 @@ function WatchedMovieItem({ movie }) {
 function MovieDetails({ selectedId, onCloseDetails, onAddToWatchedList }) {
   const [selectedMovie, setSelectedMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [userRating, setUserRating] = useState("");
+
   const {
     Title: title,
     Year: year,
     Poster: poster,
     Runtime: runtime,
     imdbRating,
-    UserRating: userRating,
     Plot: plot,
     Actors: actors,
     Director: director,
@@ -231,6 +232,7 @@ function MovieDetails({ selectedId, onCloseDetails, onAddToWatchedList }) {
       poster,
       runtime: Number(runtime.split(" ")[0]),
       imdbRating: Number(imdbRating),
+      userRating,
     };
 
     console.log("Adding movie to watched list:", movie);
@@ -259,10 +261,17 @@ function MovieDetails({ selectedId, onCloseDetails, onAddToWatchedList }) {
           </header>
           <section>
             <div className="rating">
-              <StarRating MaxRating={10} size={30} color="#fcc419" />
-              <button className="btn-add" onClick={handleAdd}>
-                Add To Watch List
-              </button>
+              <StarRating
+                MaxRating={10}
+                size={30}
+                color="#fcc419"
+                onSetRating={setUserRating}
+              />
+              {userRating > 0 && (
+                <button className="btn-add" onClick={handleAdd}>
+                  Add To Watch List
+                </button>
+              )}
             </div>
             <p>
               {language} &bull; {country}
