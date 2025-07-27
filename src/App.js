@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-
 import axios from "axios";
-import { func } from "prop-types";
+import StarRating from "./StarRating";
 
 const key = "b2523bbb";
 
@@ -65,8 +64,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
 
-  const [selectedMovie, setSelectedMovie] = useState(null);
-
   useEffect(() => {
     async function handleFetchMovies() {
       try {
@@ -93,33 +90,6 @@ export default function App() {
 
     handleFetchMovies();
   }, [query]);
-
-  function handleSelectedMovie(id) {
-    if (id === selectedId) return;
-
-    setSelectedId((id) => (id === null ? id : null));
-    async function fetchMovieDetails() {
-      try {
-        setIsLoading(true);
-        setError("");
-        const response = await axios.get(`${baseURL}&i=${id}`);
-        if (response.data.Response === "False") {
-          throw new Error(response.data.Error);
-        }
-        // selectedMovie = response.data;
-        console.log("Selected Movie:", response.data);
-        setSelectedMovie((mov) => (mov = response.data));
-        console.log("movie state", selectedMovie);
-      } catch (error) {
-        console.error("Error fetching movie details:", error);
-        setError("Failed to fetch movie details. Please try again later.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchMovieDetails();
-  }
 
   function handleClickMovie(id) {
     setSelectedId(id === selectedId ? null : id);
@@ -207,11 +177,80 @@ function WatchedMovieItem({ movie }) {
 }
 
 function MovieDetails({ selectedId, onCloseDetails }) {
+  const [selectedMovie, setSelectedMovie] = useState({});
+
+  const {
+    Title: Title,
+    Year: year,
+    Poster: poster,
+    Runtime: runtime,
+    imdbRating,
+    UserRating: userRating,
+    Plot: plot,
+    Actors: actors,
+    Director: director,
+    Genre: genre,
+    Language: language,
+    Country: country,
+  } = selectedMovie;
+
+  useEffect(
+    function () {
+      async function fetchMovieDetails() {
+        try {
+          const response = await axios.get(`${baseURL}&i=${selectedId}`);
+          if (response.data.Response === "False") {
+            throw new Error(response.data.Error);
+          }
+          // selectedMovie = response.data;
+          console.log("Selected Movie:", response.data);
+          setSelectedMovie((mov) => response.data);
+          console.log("movie state", selectedMovie);
+        } catch (error) {
+          console.error("Error fetching movie details:", error);
+        }
+      }
+
+      fetchMovieDetails();
+    },
+    [selectedMovie]
+  );
+
   return (
     <div className="details">
-      <button className="btn-back" onClick={() => onCloseDetails()}>
-        &larr;
-      </button>
+      <header>
+        <button className="btn-back" onClick={() => onCloseDetails()}>
+          &larr;
+        </button>
+        <img src={poster} alt={`Poster Of ${Title}`}></img>
+        <div className="details-overview">
+          <h2>{Title}</h2>
+          <p>
+            {year} &bull; {runtime}
+          </p>
+          <p>{genre};</p>
+          <p>⭐ {imdbRating} IMDB Rating</p>
+        </div>
+      </header>
+      <section>
+        <div className="ratting">
+          <StarRating
+            MaxRating={10}
+            size={24}
+            color="blue"
+            defaultRating={imdbRating / 2}
+          />
+        </div>
+        <p>
+          {language} &bull; {country}
+        </p>
+
+        <p className="details-plot">
+          <em>{plot}</em>
+        </p>
+        <p>Starring: {actors}</p>
+        <p>Directed by {director}</p>
+      </section>
       <p>{selectedId}</p>
     </div>
   );
