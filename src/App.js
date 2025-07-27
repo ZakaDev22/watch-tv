@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import StarRating from "./StarRating";
+import { func } from "prop-types";
 
 const key = "b2523bbb";
 
@@ -268,6 +269,14 @@ function MovieDetails({
     console.log("Adding movie to watched list:", movie);
     onAddToWatchedList({ movie });
   }
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Watch TV | ${title}`;
+    },
+    [title]
+  );
 
   return (
     <div className="details">
