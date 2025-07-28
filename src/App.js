@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import axios from "axios";
 import StarRating from "./StarRating";
 import { func } from "prop-types";
@@ -58,7 +58,7 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
-  const [query, setQuery] = useState("spider-man");
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,17 +66,20 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
     async function handleFetchMovies() {
       try {
         setIsLoading(true);
         setError("");
-        const response = await axios.get(`${baseURL}&s=${query}`);
+        const response = await axios.get(`${baseURL}&s=${query}`, { signal });
         if (response.data.Response === "False") {
           throw new Error(response.data.Error);
         }
         setMovies(response.data.Search || []);
       } catch (error) {
         console.error("Error fetching movies:", error);
+        if (error.name === "AbortError") return; // Ignore abort errors
         setError("Failed to fetch movies. Please try again later.");
       } finally {
         setIsLoading(false);
@@ -89,7 +92,12 @@ export default function App() {
       return;
     }
 
+    handleCloseDetails();
     handleFetchMovies();
+
+    return () => {
+      controller.abort(); // Cleanup function to abort the request
+    };
   }, [query]);
 
   function handleClickMovie(id) {
@@ -274,8 +282,27 @@ function MovieDetails({
     function () {
       if (!title) return;
       document.title = `Watch TV | ${title}`;
+
+      return () => {
+        document.title = "Watch TV";
+      };
     },
     [title]
+  );
+
+  useEffect(
+    function () {
+      function callBack(e) {
+        if (e.code === "Escape") {
+          onCloseDetails();
+        }
+      }
+      document.addEventListener("keydown", callBack);
+      return () => {
+        document.removeEventListener("keydown", callBack);
+      };
+    },
+    [onCloseDetails]
   );
 
   return (
@@ -359,11 +386,11 @@ function WatchedSummary({ watched }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{avgImdbRating.toFixed(2)}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(2)}</span>
         </p>
         <p>
           <span>⏳</span>
