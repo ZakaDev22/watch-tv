@@ -24,7 +24,7 @@ export default function App() {
       try {
         setIsLoading(true);
         setError("");
-        const response = await fetch(`${baseURL}&s=${query}`);
+        const response = await fetch(`${baseURL}&s=${query}`, { signal });
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -33,7 +33,7 @@ export default function App() {
           throw new Error(data.Error);
         }
 
-        setMovies(response.data.Search || []);
+        setMovies(data.Search || []);
       } catch (error) {
         console.error("Error fetching movies:", error);
         if (error.name === "AbortError") return; // Ignore abort errors
