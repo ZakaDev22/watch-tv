@@ -13,7 +13,7 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
-  "homepage": "https://ZakaDev22.github.io/watch-tv",
+  "homepage": "https://zakadev22.github.io/watch-tv",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
