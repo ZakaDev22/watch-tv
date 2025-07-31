@@ -4,7 +4,7 @@ import StarRating from "./StarRating";
 
 const key = "b2523bbb";
 
-const baseURL = `http://www.omdbapi.com/?apikey=${key}`; // Corrected baseURL
+const baseURL = `https://www.omdbapi.com/?apikey=${key}`; // Corrected baseURL
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);

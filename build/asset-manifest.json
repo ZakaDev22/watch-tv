@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/watch-tv/static/css/main.4869b440.css",
-    "main.js": "/watch-tv/static/js/main.7ce835e6.js",
+    "main.js": "/watch-tv/static/js/main.74b93f03.js",
     "index.html": "/watch-tv/index.html",
     "main.4869b440.css.map": "/watch-tv/static/css/main.4869b440.css.map",
-    "main.7ce835e6.js.map": "/watch-tv/static/js/main.7ce835e6.js.map"
+    "main.74b93f03.js.map": "/watch-tv/static/js/main.74b93f03.js.map"
   },
   "entrypoints": [
     "static/css/main.4869b440.css",
-    "static/js/main.7ce835e6.js"
+    "static/js/main.74b93f03.js"
   ]
 }
