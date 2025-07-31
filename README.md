@@ -5,10 +5,11 @@ This is a React-based movie search and watchlist application built using the [OM
 > ✅ This is a standalone project built during my React learning journey from Jonas Schmedtmann's course. I customized and deployed it to showcase my progress and skills.
 
 ---
+## 📸 Screenshot
 
-## 🚀 Live Demo
+Here’s a preview of the app in action:
 
-🌐 [Click here to visit the live app](https://your-github-username.github.io/your-repo-name)  
+![Watch TV Preview](./result.png)
 
 ---
 
