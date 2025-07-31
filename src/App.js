@@ -24,10 +24,15 @@ export default function App() {
       try {
         setIsLoading(true);
         setError("");
-        const response = await axios.get(`${baseURL}&s=${query}`, { signal });
-        if (response.data.Response === "False") {
-          throw new Error(response.data.Error);
+        const response = await fetch(`${baseURL}&s=${query}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
+        const data = await response.json();
+        if (data.Response === "False") {
+          throw new Error(data.Error);
+        }
+
         setMovies(response.data.Search || []);
       } catch (error) {
         console.error("Error fetching movies:", error);
