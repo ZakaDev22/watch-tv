@@ -89,7 +89,11 @@ export default function App() {
     <>
       <NavBar>
         <Logo />
-        <Search query={query} setQuery={setQuery} />
+        <Search
+          query={query}
+          setQuery={setQuery}
+          closeDetails={handleCloseDetails}
+        />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
@@ -417,7 +421,7 @@ function Logo() {
     </div>
   );
 }
-function Search({ query, setQuery }) {
+function Search({ query, setQuery, closeDetails }) {
   const inputEl = useRef(null);
 
   useEffect(() => {
@@ -429,11 +433,12 @@ function Search({ query, setQuery }) {
       if (e.code === "Enter") {
         inputEl.current.focus();
         setQuery("");
+        closeDetails();
       }
     }
 
     document.addEventListener("keydown", handleFocus);
-    return document.removeEventListener("keydown", handleFocus);
+    return document.addEventListener("keydown", handleFocus);
   }, [setQuery]);
 
   return (
